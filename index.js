@@ -31,7 +31,14 @@ app.get("/api/courses", async (req, res) => {
 })
 
 app.post("/api/courses", async (req, res) => {
-  const { name, grade, op, description } = req.body
+  const { password, name, grade, op, description } = req.body
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ 
+      error: "Unauthorized", 
+      message: "Invalid admin password" })
+  }
+
   const course = new Course({ name, grade, op, description })
   try {
     const savedCourse = await course.save()
