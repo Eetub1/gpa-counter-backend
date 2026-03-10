@@ -30,5 +30,16 @@ app.get("/api/courses", async (req, res) => {
   }
 })
 
+app.post("/api/courses", async (req, res) => {
+  const { name, grade, op, description } = req.body
+  const course = new Course({ name, grade, op, description })
+  try {
+    const savedCourse = await course.save()
+    res.status(201).json(savedCourse)
+  } catch (err) {
+    res.status(400).json({ message: err.message })
+  }
+})
+
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => console.log("Server running on port " + PORT))
