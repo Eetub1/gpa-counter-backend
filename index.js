@@ -21,6 +21,7 @@ const courseSchema = new mongoose.Schema({
 
 const Course = mongoose.model("Course", courseSchema)
 
+
 app.get("/api/courses", async (req, res) => {
   try {
     const courses = await Course.find()
@@ -29,6 +30,7 @@ app.get("/api/courses", async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 })
+
 
 app.put("/api/courses/:id", async (req, res) => {
   const { id } = req.params
@@ -58,6 +60,7 @@ app.put("/api/courses/:id", async (req, res) => {
   }
 })
 
+
 app.post("/api/courses", async (req, res) => {
   const { password, name, grade, op, description } = req.body
 
@@ -71,6 +74,28 @@ app.post("/api/courses", async (req, res) => {
   try {
     const savedCourse = await course.save()
     res.status(201).json(savedCourse)
+  } catch (err) {
+    res.status(400).json({ message: err.message })
+  }
+})
+
+
+app.delete("/api/courses/:id", async (req, res) => {
+  const { id } = req.params
+
+  if (req.body.password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({
+      error: "Unauthorized",
+      message: "Invalid admin password"
+    })
+  }
+
+  try {
+    const deleted = await Course.findByIdAndDelete(id)
+    if (!deleted) {
+      return res.status(404).json({ error: "Not found", message: "Course not found" })
+    }
+    res.json({ deletedId: id })
   } catch (err) {
     res.status(400).json({ message: err.message })
   }
